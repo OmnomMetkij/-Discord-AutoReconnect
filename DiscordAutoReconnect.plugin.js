@@ -98,65 +98,61 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
      const plugin = (Plugin, Library) => {
     const {Logger} = Library;
 
-    let mainTimer
-    let hostname
-    let lcExec
-    let delay
-    let currrentChannelId
+    let hostname;
+    let lcExec;
+    let delay;
+    let currrentChannelId;
 
-    const countdown = 10000
-    const maxPingValue = 250
+    const countdown = 10000;
+    const maxPingValue = 250;
 
-    const { DiscordModules, WebpackModules, } = Library
-    const { SelectedChannelStore: {getVoiceChannelId}, ChannelActions} = DiscordModules
-    const Dispatcher = WebpackModules.getByProps('dispatch', 'register')
+    const { DiscordModules, WebpackModules, } = Library;
+    const { SelectedChannelStore: {getVoiceChannelId}, ChannelActions} = DiscordModules;
+    const Dispatcher = WebpackModules.getByProps('dispatch', 'register');
 
     return class DAR extends Plugin{
         constructor(props){
-            super(props)
-            this.sp = this.getPing.bind(this)
-            this.connected = this.connected.bind(this)
+            super(props);
+            this.sp = this.getPing.bind(this);
+            this.connected = this.connected.bind(this);
         }
 
         connected(e) {
             if (e.state === "RTC_CONNECTED"){
-                if (currrentChannelId == undefined) currrentChannelId = getVoiceChannelId()
-                if (getVoiceChannelId() != currrentChannelId) currrentChannelId = getVoiceChannelId()
-                hostname = `wss://${e.hostname}`
-                Logger.debug(`Connected to ${hostname} // ${currrentChannelId}. Starting session...`)
-                lcExec = Date.now()
+                if (currrentChannelId == undefined) currrentChannelId = getVoiceChannelId();
+                if (getVoiceChannelId() != currrentChannelId) currrentChannelId = getVoiceChannelId();
+                hostname = `wss://${e.hostname}`;
+                Logger.debug(`Connected to ${hostname} // ${currrentChannelId}. Starting session...`);
+                lcExec = Date.now();
                 Dispatcher.subscribe('RTC_CONNECTION_PING', this.getPing);
             }
             if (e.state === "RTC_DISCONNECTED"){
-                Logger.debug(`Disconnected from ${hostname}`)
+                Logger.debug(`Disconnected from ${hostname}`);
                 Dispatcher.unsubscribe('RTC_CONNECTION_PING', this.getPing);
             }
         }
         getPing(e){          
-            delay = e.pings.slice(-1)[0].value
-            Logger.debug(`Echo ${hostname}: ${delay}`)
+            delay = e.pings.slice(-1)[0].value;
+            Logger.debug(`Echo ${hostname}: ${delay}`);
             if (delay >= maxPingValue){
-                new DAR().leaveCall()
+                new DAR().leaveCall();
             }
         }
   
         leaveCall(){                   
-            if (Date.now() - lcExec < countdown) return
-            currrentChannelId = getVoiceChannelId()
-            ChannelActions.disconnect()
-            this.joinCall()
+            if (Date.now() - lcExec < countdown) return;
+            currrentChannelId = getVoiceChannelId();
+            ChannelActions.disconnect();
+            this.joinCall();
         }
         joinCall(){ 
-            ChannelActions.selectVoiceChannel(currrentChannelId)
+            ChannelActions.selectVoiceChannel(currrentChannelId);
         }
         
-        onStart(){
-            Logger.info("Plugin enabled!");
-           
-            Dispatcher.subscribe('RTC_CONNECTION_STATE', this.connected)
+        onStart(){       
+            Dispatcher.subscribe('RTC_CONNECTION_STATE', this.connected);
         }
         onStop(){
-            Logger.info("Plugin disabled!");
             Dispatcher.unsubscribe('RTC_CONNECTION_STATE', this.connected);
             Dispatcher.unsubscribe('RTC_CONNECTION_PING', this.getPing);
         }
