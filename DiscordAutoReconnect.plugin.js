@@ -106,7 +106,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     const countdown = 10000;
     const maxPingValue = 250;
 
-    const { DiscordModules, WebpackModules, } = Library;
+    const { DiscordModules, WebpackModules } = Library;
     const { SelectedChannelStore: {getVoiceChannelId}, ChannelActions} = DiscordModules;
     const Dispatcher = WebpackModules.getByProps('dispatch', 'register');
 
