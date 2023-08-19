@@ -101,7 +101,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     let hostname;
     let lcExec;
     let delay;
-    let currrentChannelId;
+    let currentChannelId;
 
     const countdown = 10000;
     const maxPingValue = 250;
@@ -119,8 +119,8 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
         connected(e) {
             if (e.state === "RTC_CONNECTED"){
-                if (currrentChannelId == undefined) currrentChannelId = getVoiceChannelId();
-                if (getVoiceChannelId() != currrentChannelId) currrentChannelId = getVoiceChannelId();
+                if (currentChannelId == undefined) currentChannelId = getVoiceChannelId();
+                if (getVoiceChannelId() != currentChannelId) currentChannelId = getVoiceChannelId();
                 hostname = `wss://${e.hostname}`;
                 Logger.debug(`Connected to ${hostname} // ${currrentChannelId}. Starting session...`);
                 lcExec = Date.now();
@@ -141,12 +141,12 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
   
         leaveCall(){                   
             if (Date.now() - lcExec < countdown) return;
-            currrentChannelId = getVoiceChannelId();
+            currentChannelId = getVoiceChannelId();
             ChannelActions.disconnect();
             this.joinCall();
         }
         joinCall(){ 
-            ChannelActions.selectVoiceChannel(currrentChannelId);
+            ChannelActions.selectVoiceChannel(currentChannelId);
         }
         
         onStart(){       
