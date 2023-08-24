@@ -1,7 +1,8 @@
 /**
  * @name DiscordAutoReconnect
  * @description A plugin that allows you to automatically reconnect to a voice channel.
- * @version 1.0.0
+Uncompatible with "Platform Indicators v1.4.2".
+ * @version 1.2.0
  * @author Omnom Metkij
  * @authorId 817410117049384990
  * @authorLink https://github.com/OmnomMetkij
@@ -38,8 +39,8 @@ const config = {
     author: "Omnom Metkij",
     authorId: "817410117049384990",
     authorLink: "https://github.com/OmnomMetkij",
-    version: "1.0.0",
-    description: "A plugin that allows you to automatically reconnect to a voice channel.",
+    version: "1.2.0",
+    description: "A plugin that allows you to automatically reconnect to a voice channel.\nUncompatible with \"Platform Indicators v1.4.2\".",
     website: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     source: "https://github.com/OmnomMetkij/DAR_plugin",
     patreon: "",
@@ -49,19 +50,19 @@ const config = {
         {
             title: "Whats new?",
             items: [
-                "Radically new reconnection system."
+                "Hotfix #2."
             ]
         },
         {
-            title: "!!!Warnings!!!",
+            title: "Fixed",
             items: [
-                "Uncompatible with \"Platform Indicators v1.4.2\"."
+                "Some issues related to reconnecting to channels."
             ]
         },
         {
-            title: "Bugs",
+            title: "Issues",
             items: [
-                "Some bugs related to displaying you in the list of channels on the server."
+                "Streaming Issues."
             ]
         }
     ],
@@ -122,18 +123,18 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 if (currentChannelId == undefined) currentChannelId = getVoiceChannelId();
                 if (getVoiceChannelId() != currentChannelId) currentChannelId = getVoiceChannelId();
                 hostname = `wss://${e.hostname}`;
-                Logger.debug(`Connected to ${hostname} // ${currentChannelId}. Starting session...`);
+                BdApi.showToast(`Connected to ${hostname}.`);
                 lcExec = Date.now();
                 Dispatcher.subscribe('RTC_CONNECTION_PING', this.getPing);
             }
             if (e.state === "RTC_DISCONNECTED"){
-                Logger.debug(`Disconnected from ${hostname}`);
+                BdApi.showToast(`Disconnected from ${hostname}`);
                 Dispatcher.unsubscribe('RTC_CONNECTION_PING', this.getPing);
             }
         }
         getPing(e){          
             delay = e.pings.slice(-1)[0].value;
-            Logger.debug(`Echo ${hostname}: ${delay}`);
+            Logger.info(`Echo ${hostname}: ${delay}`);
             if (delay >= maxPingValue){
                 new DAR().leaveCall();
             }
