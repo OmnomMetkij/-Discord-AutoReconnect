@@ -122,7 +122,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 if (currentChannelId == undefined) currentChannelId = getVoiceChannelId();
                 if (getVoiceChannelId() != currentChannelId) currentChannelId = getVoiceChannelId();
                 hostname = `wss://${e.hostname}`;
-                Logger.debug(`Connected to ${hostname} // ${currrentChannelId}. Starting session...`);
+                Logger.debug(`Connected to ${hostname} // ${currentChannelId}. Starting session...`);
                 lcExec = Date.now();
                 Dispatcher.subscribe('RTC_CONNECTION_PING', this.getPing);
             }
