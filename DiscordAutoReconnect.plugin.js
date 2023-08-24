@@ -143,7 +143,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             if (Date.now() - lcExec < countdown) return;
             currentChannelId = getVoiceChannelId();
             ChannelActions.disconnect();
-            this.joinCall();
+            setTimeout(this.joinCall, 1000);
         }
         joinCall(){ 
             ChannelActions.selectVoiceChannel(currentChannelId);
