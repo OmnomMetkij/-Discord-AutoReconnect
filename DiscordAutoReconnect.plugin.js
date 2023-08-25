@@ -2,7 +2,7 @@
  * @name DiscordAutoReconnect
  * @description A plugin that allows you to automatically reconnect to a voice channel.
 Uncompatible with "Platform Indicators v1.4.2".
- * @version 1.2.0
+ * @version 1.3.0
  * @author Omnom Metkij
  * @authorId 817410117049384990
  * @authorLink https://github.com/OmnomMetkij
@@ -39,7 +39,7 @@ const config = {
     author: "Omnom Metkij",
     authorId: "817410117049384990",
     authorLink: "https://github.com/OmnomMetkij",
-    version: "1.2.0",
+    version: "1.3.0",
     description: "A plugin that allows you to automatically reconnect to a voice channel.\nUncompatible with \"Platform Indicators v1.4.2\".",
     website: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     source: "https://github.com/OmnomMetkij/DAR_plugin",
@@ -50,17 +50,11 @@ const config = {
         {
             title: "Whats new?",
             items: [
-                "Hotfix #2."
+                "Hotfix #3."
             ]
         },
         {
             title: "Fixed",
-            items: [
-                "Some issues related to reconnecting to channels."
-            ]
-        },
-        {
-            title: "Issues",
             items: [
                 "Streaming Issues."
             ]
@@ -119,7 +113,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
         }
 
         connected(e) {
-            if (e.state === "RTC_CONNECTED"){
+            if (e.state === "RTC_CONNECTED" && !e.hasOwnProperty('streamKey')){
                 if (currentChannelId == undefined) currentChannelId = getVoiceChannelId();
                 if (getVoiceChannelId() != currentChannelId) currentChannelId = getVoiceChannelId();
                 hostname = `wss://${e.hostname}`;
@@ -127,7 +121,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 lcExec = Date.now();
                 Dispatcher.subscribe('RTC_CONNECTION_PING', this.getPing);
             }
-            if (e.state === "RTC_DISCONNECTED"){
+            if (e.state === "RTC_DISCONNECTED" && !e.hasOwnProperty('streamKey')){
                 BdApi.showToast(`Disconnected from ${hostname}`);
                 Dispatcher.unsubscribe('RTC_CONNECTION_PING', this.getPing);
             }
