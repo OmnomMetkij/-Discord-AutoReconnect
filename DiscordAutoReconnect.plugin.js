@@ -2,7 +2,7 @@
  * @name DiscordAutoReconnect
  * @description A plugin that allows you to automatically reconnect to a voice channel.
 Uncompatible with "Platform Indicators v1.4.2".
- * @version 1.3.0
+ * @version 1.4.0
  * @author Omnom Metkij
  * @authorId 817410117049384990
  * @authorLink https://github.com/OmnomMetkij
@@ -39,7 +39,7 @@ const config = {
     author: "Omnom Metkij",
     authorId: "817410117049384990",
     authorLink: "https://github.com/OmnomMetkij",
-    version: "1.3.0",
+    version: "1.4.0",
     description: "A plugin that allows you to automatically reconnect to a voice channel.\nUncompatible with \"Platform Indicators v1.4.2\".",
     website: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     source: "https://github.com/OmnomMetkij/DAR_plugin",
@@ -50,13 +50,8 @@ const config = {
         {
             title: "Whats new?",
             items: [
-                "Hotfix #3."
-            ]
-        },
-        {
-            title: "Fixed",
-            items: [
-                "Streaming Issues."
+                "Added the ability to resume the stream when reconnecting.",
+                "Some internal things :)"
             ]
         }
     ],
@@ -97,60 +92,91 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     let lcExec;
     let delay;
     let currentChannelId;
+    let streamConfig = {};
+    let selfDisconnected = true;
 
     const countdown = 10000;
-    const maxPingValue = 250;
+    const maxPingValue = 1;
 
     const { DiscordModules, WebpackModules } = Library;
-    const { SelectedChannelStore: {getVoiceChannelId}, ChannelActions} = DiscordModules;
+    const { SelectedChannelStore: {getVoiceChannelId}, ChannelActions, MediaInfo } = DiscordModules;
     const Dispatcher = WebpackModules.getByProps('dispatch', 'register');
-
+    const startStream = WebpackModules.getByIndex(481008).WH;
+    
     return class DAR extends Plugin{
         constructor(props){
             super(props);
-            this.sp = this.getPing.bind(this);
+            this.getPing = this.getPing.bind(this);
             this.connected = this.connected.bind(this);
+            this.onStreamStart = this.onStreamStart.bind(this);
         }
 
         connected(e) {
             if (e.state === "RTC_CONNECTED" && !e.hasOwnProperty('streamKey')){
                 if (currentChannelId == undefined) currentChannelId = getVoiceChannelId();
                 if (getVoiceChannelId() != currentChannelId) currentChannelId = getVoiceChannelId();
-                hostname = `wss://${e.hostname}`;
+                hostname = e.hostname;
                 BdApi.showToast(`Connected to ${hostname}.`);
                 lcExec = Date.now();
                 Dispatcher.subscribe('RTC_CONNECTION_PING', this.getPing);
             }
+            
             if (e.state === "RTC_DISCONNECTED" && !e.hasOwnProperty('streamKey')){
                 BdApi.showToast(`Disconnected from ${hostname}`);
                 Dispatcher.unsubscribe('RTC_CONNECTION_PING', this.getPing);
             }
-        }
+
+            if (e.state === 'RTC_CONNECTED' && e.hasOwnProperty('streamKey')){
+                streamConfig.hadStream = true;
+            }
+            if (e.state === 'RTC_DISCONNECTED' && e.hasOwnProperty('streamKey')){
+                if (selfDisconnected) {streamConfig.hadStream = false; };
+            };
+        };
+
+        onStreamStart(e){
+            streamConfig.guildId = e.guildId;
+            streamConfig.channelId = e.channelId;
+            streamConfig.stream = {
+                'pid': e.pid,
+                'sourceId': e.sourceId,
+                'sourceName': e.sourceName
+            };
+        };
+
         getPing(e){          
             delay = e.pings.slice(-1)[0].value;
-            Logger.info(`Echo ${hostname}: ${delay}`);
-            if (delay >= maxPingValue){
+            if (delay >= maxPingValue && !MediaInfo.isMute()){
+                selfDisconnected = false;
                 new DAR().leaveCall();
-            }
-        }
+            };
+        };
   
-        leaveCall(){                   
+        leaveCall(){
             if (Date.now() - lcExec < countdown) return;
             currentChannelId = getVoiceChannelId();
             ChannelActions.disconnect();
             setTimeout(this.joinCall, 1000);
-        }
-        joinCall(){ 
+        };
+
+        joinCall(){
             ChannelActions.selectVoiceChannel(currentChannelId);
-        }
+            setTimeout(()=>{
+            if (streamConfig.hadStream){
+                startStream(streamConfig.guildId, streamConfig.channelId, streamConfig.stream);
+                selfDisconnected = true;
+            }}, 2000);
+        };
         
         onStart(){       
             Dispatcher.subscribe('RTC_CONNECTION_STATE', this.connected);
-        }
+            Dispatcher.subscribe('STREAM_START', this.onStreamStart);
+        };
         onStop(){
             Dispatcher.unsubscribe('RTC_CONNECTION_STATE', this.connected);
             Dispatcher.unsubscribe('RTC_CONNECTION_PING', this.getPing);
-        }
+            Dispatcher.unsubscribe('STREAM_START', this.onStreamStart);
+        };
 
     }
 
