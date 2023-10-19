@@ -2,7 +2,7 @@
  * @name DiscordAutoReconnect
  * @description A plugin that allows you to automatically reconnect to a voice channel.
 Uncompatible with "Platform Indicators v1.4.2".
- * @version 1.4.0
+ * @version 1.4.1
  * @author Omnom Metkij
  * @authorId 817410117049384990
  * @authorLink https://github.com/OmnomMetkij
