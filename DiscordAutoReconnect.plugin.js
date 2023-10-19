@@ -39,7 +39,7 @@ const config = {
     author: "Omnom Metkij",
     authorId: "817410117049384990",
     authorLink: "https://github.com/OmnomMetkij",
-    version: "1.4.0",
+    version: "1.4.1",
     description: "A plugin that allows you to automatically reconnect to a voice channel.\nUncompatible with \"Platform Indicators v1.4.2\".",
     website: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     source: "https://github.com/OmnomMetkij/DAR_plugin",
