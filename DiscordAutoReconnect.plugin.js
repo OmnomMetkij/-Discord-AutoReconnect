@@ -96,10 +96,10 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     const maxPingValue = 250;
     const pingCheckInterval = 5500;
 
-    const { DiscordModules, WebpackModules, PluginUpdater } = Library;
+    const { DiscordModules, WebpackModules } = Library;
     const { SelectedChannelStore: {getVoiceChannelId}, MediaInfo, MessageActions: {sendBotMessage} } = DiscordModules;
     const Dispatcher = WebpackModules.getByProps('dispatch', 'register');
-    const RTCConnection = WebpackModules.getByProps('getHostname', 'getRTCConnection', 'getAveragePing', 'getQuality')
+    const RTCConnection = WebpackModules.getByProps('getHostname', 'getRTCConnection', 'getAveragePing', 'getQuality');
 
     return class DAR extends Plugin{
         constructor(props){
@@ -149,31 +149,31 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 clearInterval(pingTimer);
                 BdApi.showToast(`Disconnected from ${hostname}`);
             }
-        };
+        }
 
 
         getPing(){
             if (conn.getLastPing() >= maxPingValue && !MediaInfo.isMute() && Date.now() - lcExec > countdown){
                 this.doReconnect();
-            };
-        };
+            }
+        }
 
         doReconnect(){
             conn.reconnect();
-        };
+        }
 
         onStart(){   
             this.checkUpdate();     
             Dispatcher.subscribe('RTC_CONNECTION_STATE', this.connected);
-        };
+        }
         onStop(){
             Dispatcher.unsubscribe('RTC_CONNECTION_STATE', this.connected);
             clearInterval(pingTimer);
-        };
+        }
 
     }
 
-};
+}
      return plugin(Plugin, Api);
 })(global.ZeresPluginLibrary.buildPlugin(config));
 /*@end@*/
