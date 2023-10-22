@@ -1,11 +1,10 @@
 /**
  * @name DiscordAutoReconnect
- * @description A plugin that allows you to automatically reconnect to a voice channel.
-Uncompatible with "Platform Indicators v1.4.2".
- * @version 1.4.1
+ * @description A plugin that allows you to automatically reconnect to a voice channel. Uncompatible with "Platform Indicators v1.4.2".
+ * @version 1.4.2
  * @author Omnom Metkij
  * @authorId 817410117049384990
- * @authorLink https://github.com/OmnomMetkij
+ * @authorLink https://github.com/OmnomMetkij/-Discord-AutoReconnect
  * @website https://www.youtube.com/watch?v=dQw4w9WgXcQ
  * @source https://raw.githubusercontent.com/OmnomMetkij/-Discord-AutoReconnect/main/DiscordAutoReconnect.plugin.js
  */
@@ -39,8 +38,8 @@ const config = {
     author: "Omnom Metkij",
     authorId: "817410117049384990",
     authorLink: "https://github.com/OmnomMetkij/-Discord-AutoReconnect",
-    version: "1.4.1",
-    description: "A plugin that allows you to automatically reconnect to a voice channel.\nUncompatible with \"Platform Indicators v1.4.2\".",
+    version: "1.4.2",
+    description: "A plugin that allows you to automatically reconnect to a voice channel. Uncompatible with \"Platform Indicators v1.4.2\".",
     website: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     source: "https://raw.githubusercontent.com/OmnomMetkij/-Discord-AutoReconnect/main/DiscordAutoReconnect.plugin.js",
     patreon: "",
@@ -50,7 +49,7 @@ const config = {
         {
             title: "Whats new?",
             items: [
-                "The code has been simplified and optimized"
+                "Some display options"
             ]
         }
     ],
@@ -132,6 +131,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
             .then(e => handleUpdate(e));
             
         }
+
         connected(e) {
             if (e.state === "RTC_CONNECTED" && !e.hasOwnProperty('streamKey')){
                 lastVoice = getVoiceChannelId();
@@ -141,20 +141,25 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 lcExec = Date.now();
                 pingTimer = setInterval(this.getPing, pingCheckInterval);
 
-                BdApi.showToast(`Connected to ${hostname}.`);
+                BdApi.showToast(`Connected to ${hostname}.`, {type:'info'});
                 sendBotMessage(lastVoice, `Endpoint: ${conn._endpoint}/${conn.port}\nChannel id: ${conn._channelId}\nGuild id: ${conn.guildId}`);
             }
             
             if (e.state === "RTC_DISCONNECTED" && !e.hasOwnProperty('streamKey')){
                 clearInterval(pingTimer);
-                BdApi.showToast(`Disconnected from ${hostname}`);
+                BdApi.showToast(`Disconnected from ${hostname}`, {type:'info'});
             }
-        }
-
+        };
 
         getPing(){
-            if (conn.getLastPing() >= maxPingValue && !MediaInfo.isMute() && Date.now() - lcExec > countdown){
-                this.doReconnect();
+            if (conn.getLastPing()){
+                if (conn.getLastPing() >= maxPingValue && !MediaInfo.isMute() && Date.now() - lcExec > countdown){
+                    return this.doReconnect();
+                }
+            }else{
+                BdApi.showNotice('[DAR] Failed to get ping. Try to reconnect to the channel.', {type:'error'});
+                clearInterval(pingTimer);
+                return;
             }
         }
 
@@ -173,7 +178,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
     }
 
-}
+};
      return plugin(Plugin, Api);
 })(global.ZeresPluginLibrary.buildPlugin(config));
 /*@end@*/
