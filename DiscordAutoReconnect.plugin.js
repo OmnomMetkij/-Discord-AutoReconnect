@@ -88,7 +88,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
     let conn;
     let hostname;
     let lcExec;
-    let lastVoice;
     let pingTimer;
 
     const countdown = 10000;
@@ -134,7 +133,6 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
 
         connected(e) {
             if (e.state === "RTC_CONNECTED" && !e.hasOwnProperty('streamKey')){
-                lastVoice = getVoiceChannelId();
                 conn = RTCConnection.getRTCConnection();
                 hostname = conn.hostname;
 
@@ -142,7 +140,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 pingTimer = setInterval(this.getPing, pingCheckInterval);
 
                 BdApi.showToast(`Connected to ${hostname}.`, {type:'info'});
-                sendBotMessage(lastVoice, `Endpoint: ${conn._endpoint}/${conn.port}\nChannel id: ${conn._channelId}\nGuild id: ${conn.guildId}`);
+                sendBotMessage(getVoiceChannelId(), `Endpoint: ${conn._endpoint}/${conn.port}\nChannel id: ${conn._channelId}\nGuild id: ${conn.guildId}`);
             }
             
             if (e.state === "RTC_DISCONNECTED" && !e.hasOwnProperty('streamKey')){
