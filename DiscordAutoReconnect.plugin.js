@@ -140,7 +140,7 @@ module.exports = !global.ZeresPluginLibrary ? Dummy : (([Plugin, Api]) => {
                 pingTimer = setInterval(this.getPing, pingCheckInterval);
 
                 BdApi.showToast(`Connected to ${hostname}.`, {type:'info'});
-                sendBotMessage(getVoiceChannelId(), `Endpoint: ${conn._endpoint}/${conn.port}\nChannel id: ${conn._channelId}\nGuild id: ${conn.guildId}`);
+                //sendBotMessage(getVoiceChannelId(), `Endpoint: ${conn._endpoint}/${conn.port}\nChannel id: ${conn._channelId}\nGuild id: ${conn.guildId}`);
             }
             
             if (e.state === "RTC_DISCONNECTED" && !e.hasOwnProperty('streamKey')){
