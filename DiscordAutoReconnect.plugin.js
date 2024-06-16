@@ -1,7 +1,7 @@
 /**
  * @name DiscordAutoReconnect
  * @description A plugin that allows you to automatically reconnect to a voice channel. Uncompatible with "Platform Indicators v1.4.2".
- * @version 1.4.2
+ * @version 1.4.3
  * @author Omnom Metkij
  * @authorId 817410117049384990
  * @authorLink https://github.com/OmnomMetkij/-Discord-AutoReconnect
@@ -38,7 +38,7 @@ const config = {
     author: "Omnom Metkij",
     authorId: "817410117049384990",
     authorLink: "https://github.com/OmnomMetkij/-Discord-AutoReconnect",
-    version: "1.4.2",
+    version: "1.4.3",
     description: "A plugin that allows you to automatically reconnect to a voice channel. Uncompatible with \"Platform Indicators v1.4.2\".",
     website: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     source: "https://raw.githubusercontent.com/OmnomMetkij/-Discord-AutoReconnect/main/DiscordAutoReconnect.plugin.js",
